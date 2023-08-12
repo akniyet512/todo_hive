@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:todo_hive/domain/entity/task.dart';
-import 'package:todo_hive/widgets/tasks/tasks_widget_model.dart';
+import 'package:todo_hive/ui/widgets/tasks/tasks_widget_model.dart';
 
 class TasksWidget extends StatefulWidget {
-  const TasksWidget({super.key});
+  final int groupKey;
+
+  const TasksWidget({
+    super.key,
+    required this.groupKey,
+  });
 
   @override
   State<TasksWidget> createState() => _TasksWidgetState();
@@ -14,14 +19,9 @@ class _TasksWidgetState extends State<TasksWidget> {
   TasksWidgetModel? _model;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_model == null) {
-      final Map<String, dynamic> args =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-      final int groupKey = args["groupKey"] as int;
-      _model = TasksWidgetModel(groupKey: groupKey);
-    }
+  void initState() {
+    super.initState();
+    _model = TasksWidgetModel(groupKey: widget.groupKey);
   }
 
   @override
@@ -118,7 +118,8 @@ class _TasksListRowWidget extends StatelessWidget {
         ),
         trailing:
             task.isDone ? const Icon(Icons.done) : const Icon(Icons.portrait),
-        onTap: () => TasksWidgetModelProvider.read(context)!.model.doneToggle(index),
+        onTap: () =>
+            TasksWidgetModelProvider.read(context)!.model.doneToggle(index),
       ),
     );
   }

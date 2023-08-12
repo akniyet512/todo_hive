@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:todo_hive/widgets/task_form/task_form_widget_model.dart';
+import 'package:todo_hive/ui/widgets/task_form/task_form_widget_model.dart';
 
 class TaskFormWidget extends StatefulWidget {
-  const TaskFormWidget({super.key});
+  final int groupKey;
+
+  const TaskFormWidget({
+    super.key,
+    required this.groupKey,
+  });
 
   @override
   State<TaskFormWidget> createState() => _TaskFormWidgetState();
@@ -12,14 +17,9 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
   TaskFormWidgetModel? _model;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_model == null) {
-      final Map<String, dynamic> args =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-      final int groupKey = args["groupKey"] as int;
-      _model = TaskFormWidgetModel(groupKey: groupKey);
-    }
+  void initState() {
+    super.initState();
+      _model = TaskFormWidgetModel(groupKey: widget.groupKey);
   }
 
   @override
