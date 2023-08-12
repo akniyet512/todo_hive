@@ -76,7 +76,7 @@ class _GroupsListRowWidget extends StatelessWidget {
         motion: const ScrollMotion(),
         children: [
           SlidableAction(
-            onPressed: (context) async => GroupsWidgetModelProvider.read(context)!.model.deleteGroup(index),
+            onPressed: (context) async => await GroupsWidgetModelProvider.read(context)!.model.deleteGroup(index),
             backgroundColor: const Color(0xFFFE4A49),
             foregroundColor: Colors.white,
             icon: Icons.delete,
@@ -87,7 +87,7 @@ class _GroupsListRowWidget extends StatelessWidget {
       child: ListTile(
         title: Text(group.name),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {},
+        onTap: () async => await GroupsWidgetModelProvider.read(context)!.model.showTasks(context, index),
       ),
     );
   }

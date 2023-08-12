@@ -11,7 +11,7 @@ class GroupFormWidgetModel {
       Hive.registerAdapter(GroupAdapter());
     }
 
-    final Box groupBox = await Hive.openBox<Group>("group_box");
+    final Box<Group> groupBox = await Hive.openBox<Group>("group_box");
     final Group group = Group(name: groupName);
     await groupBox.add(group).whenComplete(() {
       Navigator.of(context).pop();
