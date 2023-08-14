@@ -3,20 +3,34 @@ import 'package:hive/hive.dart';
 import 'package:todo_hive/domain/data_provider/box_manager.dart';
 import 'package:todo_hive/domain/entity/group.dart';
 
-class GroupFormWidgetModel {
-  String groupName = "";
+class GroupFormWidgetModel extends ChangeNotifier {
+  String _groupName = "";
+  String? errorText;
+
+  set groupName(String value) {
+    if (errorText != null && _groupName.trim().isNotEmpty) {
+      errorText = null;
+      notifyListeners();
+    }
+    _groupName = value;
+  }
+
   Future<void> saveGroup(BuildContext context) async {
-    if (groupName.isEmpty) return;
+    if (_groupName.trim().isEmpty) {
+      errorText = "Enter group name";
+      notifyListeners();
+      return;
+    }
 
     final Box<Group> groupBox = await BoxManager.instance.openGroupBox();
-    final Group group = Group(name: groupName);
+    final Group group = Group(name: _groupName);
     await groupBox.add(group).whenComplete(() {
       Navigator.of(context).pop();
     });
   }
 }
 
-class GroupFormWidgetModelProvider extends InheritedWidget {
+class GroupFormWidgetModelProvider extends InheritedNotifier {
   final GroupFormWidgetModel model;
 
   const GroupFormWidgetModelProvider({
@@ -25,6 +39,7 @@ class GroupFormWidgetModelProvider extends InheritedWidget {
     required this.model,
   }) : super(
           child: child,
+          notifier: model,
         );
 
   static GroupFormWidgetModelProvider? watch(BuildContext context) {

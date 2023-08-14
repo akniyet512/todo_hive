@@ -19,7 +19,7 @@ class _TaskFormWidgetState extends State<TaskFormWidget> {
   @override
   void initState() {
     super.initState();
-      _model = TaskFormWidgetModel(groupKey: widget.groupKey);
+    _model = TaskFormWidgetModel(groupKey: widget.groupKey);
   }
 
   @override
@@ -44,6 +44,8 @@ class _TaskFormWidgetBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    TaskFormWidgetModel? model =
+        TaskFormWidgetModelProvider.watch(context)?.model;
     return Scaffold(
       appBar: AppBar(
         title: const Text("New task"),
@@ -54,12 +56,12 @@ class _TaskFormWidgetBody extends StatelessWidget {
           child: _TaskTextWidget(),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async => await TaskFormWidgetModelProvider.read(context)
-            ?.model
-            .saveTask(context),
-        child: const Icon(Icons.done),
-      ),
+      floatingActionButton: model?.isValid == true
+          ? FloatingActionButton(
+              onPressed: () async => await model?.saveTask(context),
+              child: const Icon(Icons.done),
+            )
+          : null,
     );
   }
 }
