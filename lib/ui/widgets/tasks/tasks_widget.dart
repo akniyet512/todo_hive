@@ -5,10 +5,12 @@ import 'package:todo_hive/ui/widgets/tasks/tasks_widget_model.dart';
 
 class TasksWidget extends StatefulWidget {
   final int groupKey;
+  final String title;
 
   const TasksWidget({
     super.key,
     required this.groupKey,
+    required this.title,
   });
 
   @override
@@ -21,7 +23,10 @@ class _TasksWidgetState extends State<TasksWidget> {
   @override
   void initState() {
     super.initState();
-    _model = TasksWidgetModel(groupKey: widget.groupKey);
+    _model = TasksWidgetModel(
+      groupKey: widget.groupKey,
+      title: widget.title,
+    );
   }
 
   @override
@@ -48,10 +53,9 @@ class _TasksWidgetBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final TasksWidgetModel? model =
         TasksWidgetModelProvider.watch(context)?.model;
-    final String title = model?.group?.name ?? "NO NAME";
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(model?.title ?? "Tasks"),
       ),
       body: const _TasksList(),
       floatingActionButton: FloatingActionButton(
@@ -118,8 +122,8 @@ class _TasksListRowWidget extends StatelessWidget {
         ),
         trailing:
             task.isDone ? const Icon(Icons.done) : const Icon(Icons.portrait),
-        onTap: () =>
-            TasksWidgetModelProvider.read(context)!.model.doneToggle(index),
+        onTap: () async =>
+            await TasksWidgetModelProvider.read(context)!.model.doneToggle(index),
       ),
     );
   }

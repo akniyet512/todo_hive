@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todo_hive/domain/data_provider/box_manager.dart';
 import 'package:todo_hive/domain/entity/group.dart';
 import 'package:todo_hive/ui/navigation/main_navigation.dart';
 
 class GroupsWidgetModel extends ChangeNotifier {
+  late final Box<Group> _groupBox;
   GroupsWidgetModel() {
     _setup();
   }
@@ -16,43 +18,32 @@ class GroupsWidgetModel extends ChangeNotifier {
   }
 
   Future<void> showTasks(BuildContext context, int index) async {
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(GroupAdapter());
-    }
-
-    await Hive.openBox<Group>("group_box").then((Box<Group> box) async {
-      final int groupKey = box.keyAt(index) as int;
+    final Group? group = _groupBox.getAt(index);
+    if (group != null) {
       await Navigator.of(context).pushNamed(
         MainNavigationRouteNames.tasks,
         arguments: {
-          "groupKey": groupKey,
+          "groupKey": group.key as int,
+          "title": group.name,
         },
       );
-    });
+    }
   }
 
   Future<void> _setup() async {
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(GroupAdapter());
-    }
-
-    final Box<Group> box = await Hive.openBox<Group>("group_box");
-    _readGroupsFromHive(box);
-    box.listenable().addListener(() => _readGroupsFromHive(box));
+    _groupBox = await BoxManager.instance.openGroupBox();
+    _readGroupsFromHive();
+    _groupBox.listenable().addListener(() => _readGroupsFromHive());
   }
 
   Future<void> deleteGroup(int index) async {
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(GroupAdapter());
-    }
-
-    final Box<Group> box = await Hive.openBox<Group>("group_box");
-    await box.getAt(index)?.tasks?.deleteAllFromHive();
-    await box.deleteAt(index);
+    final int groupKey = _groupBox.keyAt(index) as int;
+    await Hive.deleteBoxFromDisk("task_box_$groupKey");
+    await _groupBox.deleteAt(index);
   }
 
-  void _readGroupsFromHive(Box<Group> box) {
-    _groups = box.values.toList();
+  void _readGroupsFromHive() {
+    _groups = _groupBox.values.toList();
     notifyListeners();
   }
 }

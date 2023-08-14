@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:todo_hive/domain/entity/group.dart';
+import 'package:todo_hive/domain/data_provider/box_manager.dart';
 import 'package:todo_hive/domain/entity/task.dart';
 
 class TaskFormWidgetModel {
@@ -13,22 +13,12 @@ class TaskFormWidgetModel {
   Future<void> saveTask(BuildContext context) async {
     if (taskText.isEmpty) return;
 
-    if (!Hive.isAdapterRegistered(0)) {
-      Hive.registerAdapter(GroupAdapter());
-    }
-    if (!Hive.isAdapterRegistered(1)) {
-      Hive.registerAdapter(TaskAdapter());
-    }
-    final Box<Task> taskBox = await Hive.openBox<Task>("task_box");
+    final Box<Task> taskBox = await BoxManager.instance.openTaskBox(groupKey);
     final Task task = Task(
       text: taskText,
       isDone: false,
     );
-    await taskBox.add(task);
-
-    await Hive.openBox<Group>("group_box").then((Box<Group> groupBox) {
-      final Group group = groupBox.get(groupKey)!;
-      group.addTask(taskBox, task);
+    await taskBox.add(task).whenComplete(() {
       Navigator.of(context).pop();
     });
   }

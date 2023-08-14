@@ -25,9 +25,13 @@ class MainNavigation {
     switch (settings.name) {
       case MainNavigationRouteNames.tasks:
         final int groupKey = args["groupKey"];
+        final String title = args["title"];
         return MaterialPageRoute(
           builder: (context) {
-            return TasksWidget(groupKey: groupKey);
+            return TasksWidget(
+              groupKey: groupKey,
+              title: title,
+            );
           },
           settings: RouteSettings(name: "${settings.name}/$groupKey"),
         );
@@ -37,7 +41,8 @@ class MainNavigation {
           builder: (context) {
             return TaskFormWidget(groupKey: groupKey);
           },
-          settings: RouteSettings(name: "${MainNavigationRouteNames.tasks}/$groupKey/addTask"),
+          settings: RouteSettings(
+              name: "${MainNavigationRouteNames.tasks}/$groupKey/addTask"),
         );
       default:
         return MaterialPageRoute(
